@@ -1,0 +1,26 @@
+services:
+  nginx-proxy:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"
+      DISABLE_IPV6: 'true'
+    volumes:
+      - /srv/data/nginx-proxy:/data
+      - /srv/config/nginx/letsencrypt:/etc/letsencrypt
+      - /srv/logs/nginx:/data/logs
+    networks:
+      - web-proxy
+    healthcheck:
+      test: ["CMD", "/usr/bin/check-health"]
+      interval: 10s
+      timeout: 3s
+
+networks:
+  web-proxy:
+    external: true
+
